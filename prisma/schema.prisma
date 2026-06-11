@@ -1,0 +1,99 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================
+// User & Authentication
+// ============================================
+
+model User {
+  id        String  @id @default(auto()) @map("_id") @db.ObjectId
+  clerkId   String  @unique
+  email     String  @unique
+  firstName String?
+  lastName  String?
+  avatar    String?
+
+  // Relations
+  chats     Chat[]
+  documents Document[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+
+// ============================================
+// Documents & Knowledge Base
+// ============================================
+
+model Document {
+  id          String  @id @default(auto()) @map("_id") @db.ObjectId
+  title       String
+  description String?
+  fileUrl     String? // URL to uploaded file
+  fileType    String? // PDF, DOCX, etc.
+  fileSize    Int? // in bytes
+
+  // Document classification
+  category String? // e.g., "Banking", "Securities", "KYC/AML"
+  source   String? // e.g., "RBI", "SEBI", "Internal"
+  tags     String[] // For search and filtering
+
+  // AI processing status
+  isProcessed Boolean  @default(false)
+  summary     String? // AI-generated summary
+  keyPoints   String[] // Extracted insights
+
+  // Relations
+  userId String @db.ObjectId
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@index([category])
+  @@index([isProcessed])
+  @@index([createdAt])
+}
+
+// ============================================
+// AI Chat & Queries
+// ============================================
+model Chat {
+  id        String  @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String  // Clerk user ID (string, not ObjectId)
+  sessionId String  // Session ID (string, not ObjectId)
+  user      User    @relation(fields: [userId], references: [clerkId], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  @@index([userId])
+  @@index([sessionId])  
+}
+
+// ============================================
+// System Settings
+// ============================================
+
+model SystemSettings {
+  id             String  @id @default(auto()) @map("_id") @db.ObjectId
+  userId         String  @unique // One setting per user
+  email          String // User's email for notifications
+  cronJobEnabled Boolean @default(false)
+  sourceUrl      String  @default("") // User's source URL for link extraction
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([cronJobEnabled]) // Index for querying enabled cron jobs
+}
