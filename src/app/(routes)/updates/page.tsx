@@ -4,7 +4,6 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import {
-  Bell,
   Filter,
   Building2,
   Scale,
