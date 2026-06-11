@@ -2,19 +2,20 @@
 
 import { motion } from "framer-motion";
 import Link from "next/link";
-import { 
-  Brain, 
-  Shield, 
+import {
+  Brain,
+  Shield,
   Zap,
   ArrowRight,
   Sparkles,
-  Activity,
-  AlertTriangle,
-  CheckCircle2,
-  Clock
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 
 const features = [
   {
@@ -31,37 +32,6 @@ const features = [
     icon: Zap,
     title: "Autonomous Reasoning",
     description: "Self-improving compliance workflows with explainable AI"
-  }
-];
-
-const stats = [
-  { 
-    label: "Total Documents", 
-    value: "1,234", 
-    change: "+12.5%",
-    trend: "up",
-    icon: Activity
-  },
-  { 
-    label: "Risk Alerts", 
-    value: "48", 
-    change: "-8.2%",
-    trend: "down",
-    icon: AlertTriangle
-  },
-  { 
-    label: "Compliance Rate", 
-    value: "94.8%", 
-    change: "+2.3%",
-    trend: "up",
-    icon: CheckCircle2
-  },
-  { 
-    label: "Avg Response Time", 
-    value: "2.4s", 
-    change: "-15%",
-    trend: "down",
-    icon: Clock
   }
 ];
 
@@ -117,48 +87,6 @@ export default function Landing() {
           </motion.div>
         </div>
       </section>
-
-      {/* Stats Dashboard */}
-      {/* <section className="border-t border-border bg-card/30 py-12">
-        <div className="container mx-auto px-6">
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-            {stats.map((stat, idx) => (
-              <motion.div
-                key={stat.label}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: idx * 0.05 }}
-              >
-                <Card className="border-border bg-card hover:bg-accent/5 transition-colors">
-                  <CardContent className="p-6">
-                    <div className="flex items-start justify-between">
-                      <div className="flex-1">
-                        <p className="text-sm font-medium text-muted-foreground">
-                          {stat.label}
-                        </p>
-                        <div className="mt-2 flex items-baseline gap-2">
-                          <h3 className="text-3xl font-bold tracking-tight">
-                            {stat.value}
-                          </h3>
-                          <span className={`text-sm font-medium ${
-                            stat.trend === 'up' ? 'text-green-500' : 'text-red-500'
-                          }`}>
-                            {stat.change}
-                          </span>
-                        </div>
-                      </div>
-                      <div className="rounded-lg bg-primary/10 p-2.5">
-                        <stat.icon className="h-5 w-5 text-primary" />
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section> */}
 
       {/* Features Section */}
       <section className="py-20 px-10">
