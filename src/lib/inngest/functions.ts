@@ -4,11 +4,11 @@ import { prisma } from "@/lib/prisma";
 import { sendEmail } from "@/lib/email";
 import { generateCronJobEmailHTML, generateCronJobEmailText } from "./email-template";
 
-// Extract links from source and train KB - runs daily at 12:00 PM IST
+// Extract links from source and train KB - runs every 5 minutes
 export const extractAndTrainKB = inngest.createFunction(
-    { id: "extract-and-train-kb" },
-    { cron: "*/5 * * * *" }, // Runs every 5 minutes
-    async ({ step }) => {
+    { id: "extract-and-train-kb", name: "Extract and Train Knowledge Base" },
+    { cron: "*/5 * * * *" },
+    async ({ step, logger }) => {
         // Step 1: Get all users with cron job enabled
         const enabledUsers = await step.run("get-enabled-users", async () => {
             try {
@@ -22,7 +22,7 @@ export const extractAndTrainKB = inngest.createFunction(
                 });
                 return users;
             } catch (error) {
-                console.error("Error fetching enabled users:", error);
+                logger.error("Error fetching enabled users:", error);
                 return [];
             }
         });
@@ -132,7 +132,7 @@ export const extractAndTrainKB = inngest.createFunction(
                         };
                     }
                 } catch (error) {
-                    console.error(`Failed to process user ${user.userId}:`, error);
+                    logger.error(`Failed to process user ${user.userId}:`, error);
                     
                     // Send error email
                     await sendEmail({
@@ -178,29 +178,30 @@ export const extractAndTrainKB = inngest.createFunction(
 );
 
 // Train KB with multiple links - can be triggered by cron or manually
+// Uncomment and fix if needed
 // export const trainKBWithLinks = inngest.createFunction(
-//     { id: "train-kb-with-links" },
+//     { id: "train-kb-with-links", name: "Train KB with Links" },
 //     { event: "app/train.kb" },
-//     async ({ step }) => {
-//         // const { links, ragId, lyzrApiKey, source, sourceUrl } = event.data;
-
+//     async ({ step, event, logger }) => {
+//         const { links, ragId, lyzrApiKey, source, sourceUrl } = event.data;
+//
 //         const config = {
 //             userId: 'mem_1234567890abcdef',
 //             linkExtractionAgentId: '690123a7de7c6b951adfb4c8',
-//             ragId: '69012147a8183b569886f67d',
-//             lyzrApiKey: process.env.LYZR_API_KEY || "",
-//             sourceUrl: "https://www.inngest.com/docs",
+//             ragId: ragId || process.env.LYZR_AUTO_RAG_ID || '69012147a8183b569886f67d',
+//             lyzrApiKey: lyzrApiKey || process.env.LYZR_API_KEY || "",
+//             sourceUrl: sourceUrl || "https://www.inngest.com/docs",
 //         };
-
+//
 //         const test = await extractLinksFromSource(
-//                                 config.userId,
-//                                 config.linkExtractionAgentId,
-//                                 config.lyzrApiKey,
-//                                 config.sourceUrl
-//                             );
-
-//         // console.log(test);
-
+//             config.userId,
+//             config.linkExtractionAgentId,
+//             config.lyzrApiKey,
+//             config.sourceUrl
+//         );
+//
+//         logger.info("Extracted links:", test);
+//
 //         // Validate input
 //         if (!test.links || !Array.isArray(test.links) || test.links.length === 0) {
 //             return {
@@ -208,15 +209,15 @@ export const extractAndTrainKB = inngest.createFunction(
 //                 message: "No links provided for training",
 //             };
 //         }
-
+//
 //         if (!config.ragId || !config.lyzrApiKey) {
 //             return {
 //                 success: false,
 //                 message: "Missing ragId or lyzrApiKey",
 //             };
 //         }
-
-//         // // Train KB with all links at once
+//
+//         // Train KB with all links at once
 //         const trainingResult = await step.run("train-kb-with-all-links", async () => {
 //             try {
 //                 return await trainRagWithMultipleWebsites(
@@ -225,11 +226,11 @@ export const extractAndTrainKB = inngest.createFunction(
 //                     test.links
 //                 );
 //             } catch (error) {
-//                 console.error("Failed to train KB with extracted links:", error);
+//                 logger.error("Failed to train KB with extracted links:", error);
 //                 return { success: false, error: String(error) };
 //             }
 //         });
-
+//
 //         return {
 //             success: true,
 //             linksProcessed: test.links.length,
